@@ -18,6 +18,7 @@ import ChangePasswordPage from './pages/ChangePasswordPage';
 import AboutUs from './pages/AboutUs';
 import Contact from './pages/Contact';
 import FAQ from './pages/FAQ';
+import SearchResultsPage from './pages/SearchResultsPage';
 
 const App = () => {
   return (
@@ -41,6 +42,7 @@ const App = () => {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/search" element={<SearchResultsPage />} />
         </Routes>
       </main>
       <Footer />

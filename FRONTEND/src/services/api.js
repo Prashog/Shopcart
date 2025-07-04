@@ -67,4 +67,9 @@ export const removeFromWishlist = (productId) =>
 export const submitReview = (productId, reviewData) =>
   api.post(`/reviews/${productId}`, reviewData);
 
+export const searchProducts = (query) => api.get(`/products/search?query=${encodeURIComponent(query)}`);
+export const getSuggestions = (query) =>
+  api.get(`/products/suggestions?q=${encodeURIComponent(query)}`);
+
+
 export default api;
