@@ -1,0 +1,119 @@
+👤 User Features
+Sign up / Login / Forgot Password (JWT and bcrypt)
+
+Browse and search products
+
+Filter by category, price, ratings
+
+Product detail page
+
+Add to cart / wishlist
+
+Checkout with Stripe or Razorpay integration
+
+View past orders and order status
+
+Product reviews and ratings
+
+
+
+🛠️ Admin Features
+Secure admin login
+
+Dashboard with charts (e.g., Recharts)
+
+Add/edit/delete products
+
+Manage categories and brands
+
+View all users and orders
+
+Change order status (e.g., pending, shipped, delivered)
+
+📦 Tech Stack
+Frontend: React, Redux Toolkit, React Router, Tailwind CSS or Material UI
+
+Backend: Node.js, Express.js
+
+Database: MongoDB + Mongoose
+
+Authentication: JWT (JSON Web Token)
+
+Payment Gateway: Stripe or Razorpay
+
+File Upload: Multer or Cloudinary for product images
+
+🌟 Bonus Features (Optional but Impressive)
+Product recommendations (“Customers also bought”)
+
+Coupons and discount codes
+
+Email notifications on order status (using Nodemailer)
+
+Real-time order updates using WebSocket/Socket.IO
+
+Progressive Web App (PWA) support for mobile optimization
+
+Multilingual support
+
+
+----------------------------------------------------------------------------------------------------------------
+BACKEND
+----------------------------------------------------------------------------------------------------------------
+AUTHENTICATION:
+Method	Endpoint	                    Description
+POST	/api/auth/register	            Register a new user
+POST	/api/auth/login	                Login existing user
+POST	/api/auth/forgot-password	    Send reset link via email
+POST	/api/auth/reset-password	    Reset password using token
+GET	    /api/auth/me	                Get current user (token)    -------  Not Required
+
+USER ROUTES
+Method	Endpoint	        Description
+GET	    /api/users/me	    Get logged-in user profile
+PUT	    /api/users/me	    Update user profile
+GET	    /api/users/orders	Get user's order history
+GET     /api/users/wishlist Get user's wishlist
+
+Admin Product Routes (adminRoutes.js)
+Method	Endpoint	                    Description
+POST	/api/admin/products	            Create new product (admin)
+PUT	    /api/admin/products/:id	        Update product (admin)
+DELETE	/api/admin/products/:id	        Delete product (admin)
+
+Category Routes (adminRoutes.js or productRoutes.js)
+Method	Endpoint	        Description
+GET	    /api/categories	    List all categories
+POST	/api/categories	    Add category (admin only)
+
+Order Routes (orderRoutes.js)
+Method	Endpoint	            Description
+POST	/api/orders	            Create a new order
+GET	    /api/orders/:id	        Get order by ID (auth required)
+PUT	    /api/orders/:id         pay	Mark order as paid
+PUT     /api/orders/wishlist    add product to wishlist
+
+Admin Order Routes (adminRoutes.js)
+Method	    Endpoint	            Description
+GET	        /api/admin/orders	    View all orders (admin only)
+PUT	        /api/admin/orders/:id	Update order status
+
+Stripe Payment Route     (**OPTIONAL**)
+Method	Endpoint	                Description
+POST	/api/payments/checkout	    Create Stripe checkout session
+
+MIDDLEWARE
+authMiddleware.js:  Checks for JWT in headers
+adminMiddleware.js: Verifies admin role
+
+----------------------------------------------------------------------------------------------------------------
+
+admin credentials:
+"name: "admin"
+admin: admin@gmail.com
+password: qwerty
+
+user credentials:
+"name" : "user",
+"email": "user@gmail.com",
+"password": "qwerty"
