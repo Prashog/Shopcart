@@ -11,13 +11,13 @@ const CartItem = ({ item, isReview = false }) => {
                 <div className="flex-grow px-4">
                     <h2 className="font-bold text-lg">{item.name}</h2>
                     <p className="text-gray-500">Color: Pink</p> {/* Example static color */}
-                    {!isReview && <p className="font-semibold">${item.price}</p>}
+                    {!isReview && <p className="font-semibold">₹{item.price}</p>}
                 </div>
             </div>
 
             {isReview ? (
                  <div className="text-right">
-                    <p className="font-bold text-lg">${(item.price * item.qty).toFixed(2)}</p>
+                    <p className="font-bold text-lg">₹{(item.price * item.qty).toFixed(2)}</p>
                     <p className="text-gray-500">Quantity: {item.qty}</p>
                  </div>
             ) : (

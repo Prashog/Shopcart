@@ -55,8 +55,8 @@ export const getOrderById = (id) => api.get(`/orders/${id}`);
 export const getCategories = () => api.get('/categories');
 
 // ===== Review and wishlist =====
-export const addToWishlist = (productId) =>
-  api.post('/wishlist', { productId });
+export const addToWishlist = (id) =>
+  api.post(`/wishlist/${id}`);
 
 export const getWishlist = () =>
   api.get('/wishlist');
@@ -67,9 +67,11 @@ export const removeFromWishlist = (productId) =>
 export const submitReview = (productId, reviewData) =>
   api.post(`/reviews/${productId}`, reviewData);
 
-export const searchProducts = (query) => api.get(`/products/search?query=${encodeURIComponent(query)}`);
-export const getSuggestions = (query) =>
-  api.get(`/products/suggestions?q=${encodeURIComponent(query)}`);
-
+// ===== Addresses =====
+export const addAddress = (addressData) => api.post('/address', addressData);
+export const updateAddress = (addressId, updatedData) => api.put(`/address/${addressId}`, updatedData);
+export const deleteAddress = (addressId) => api.delete(`/address/${addressId}`);
+export const getAddresses = () => api.get('/address');
+export const getPrimaryAddress = () => api.get('/address/primary');
 
 export default api;

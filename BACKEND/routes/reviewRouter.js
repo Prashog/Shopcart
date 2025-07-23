@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { addReviewController } = require('../controllers/reviewController');
+const { addReviewController, getReviews } = require('../controllers/reviewController');
 const { jwtAuthMiddleware } = require('../middlewares/authMiddleware');
 
-// Add a review to a product
 router.post('/:productId', jwtAuthMiddleware, addReviewController);
+router.get('/:productId', getReviews);
 
 module.exports = router;

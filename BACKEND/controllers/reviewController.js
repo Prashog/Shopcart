@@ -1,4 +1,6 @@
+const Review = require('../models/reviewModel');
 const Product = require('../models/productModel');
+const reviewModel = require('../models/reviewModel');
 
 async function addReviewController(req, res) {
   try {
@@ -8,28 +10,50 @@ async function addReviewController(req, res) {
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: 'Product not found' });
 
-    const review = {
-      user: req.user._id,
+    const review = await Review.create({
+      product: productId,
+      user: req.user.id,
       name: req.user.name,
-      rating: Number(rating),
+      rating,
       comment
-    };
+    });
 
-    product.reviews.push(review);
-    product.numReviews = product.reviews.length;
-    product.rating = (
-      product.reviews.reduce((acc, r) => acc + r.rating, 0) / product.numReviews
-    ).toFixed(1);
+    // Recalculate numReviews and rating
+    await Product.calculateReviews(productId);
 
-    await product.save();
-
-    res.status(201).json({ message: 'Review added', review });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Server error', error });
+    res.status(201).json({ message: 'Review added successfully', review });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
   }
-};
+}
+
+async function getReviews(req, res) {
+  try {
+    const productId = req.params.productId;
+    const reviews = await reviewModel.find({product: productId});
+
+    if(!reviews) {
+      return res.status(404).json({
+        status: false,
+        error: 'Reviews not found'
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      response: reviews
+    })
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      success: false,
+      error: 'Internal Server Error'
+    })
+  }
+}
 
 module.exports = {
-  addReviewController
+  addReviewController,
+  getReviews
 }

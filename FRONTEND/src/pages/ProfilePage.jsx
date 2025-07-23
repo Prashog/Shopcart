@@ -3,19 +3,24 @@ import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/common/Button';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
+import ProductCard from '../components/products/ProductCard';
+import { AiOutlineDelete } from 'react-icons/ai';
 
 const ProfilePage = () => {
   const { user, logout, loading } = useAuth();
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [wishlistProducts, setWishlistProducts] = useState([]);
+  const [addresses, setAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
 
   useEffect(() => {
-    const fetchOrdersAndWishlist = async () => {
+    const fetchData = async () => {
       try {
-        const [orderRes, profileRes] = await Promise.all([
+        const [orderRes, profileRes, addressRes] = await Promise.all([
           api.get('/orders'),
           api.get('/users/me'),
+          api.get('/address'),
         ]);
 
         if (orderRes.data.success) {
@@ -24,24 +29,73 @@ const ProfilePage = () => {
 
         if (profileRes.data.success) {
           const wishlistIds = profileRes.data.response.wishlist;
-          const productPromises = wishlistIds.map(id =>
+          const productPromises = wishlistIds.map((id) =>
             api.get(`/products/${id}`)
           );
           const productResults = await Promise.all(productPromises);
-          const products = productResults.map(res => res.data.response);
+          const products = productResults.map((res) => res.data.response);
           setWishlistProducts(products);
+        }
+
+        if (addressRes.data.success) {
+          setAddresses(addressRes.data.response);
+          const defaultAddress = addressRes.data.response.find(
+            (addr) => addr.isDefault
+          );
+          if (defaultAddress) setSelectedAddressId(defaultAddress._id);
         }
       } catch (error) {
         console.error('Error fetching profile data:', error);
       }
     };
 
-    if (user) fetchOrdersAndWishlist();
+    if (user) fetchData();
   }, [user]);
 
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleAddressChange = async (id) => {
+    const previousDefault = addresses.find(
+      (addr) => addr._id === selectedAddressId
+    );
+
+    try {
+      if (previousDefault && previousDefault._id !== id) {
+        await api.put(`/address/${previousDefault._id}`, { isDefault: false });
+      }
+      await api.put(`/address/${id}`, { isDefault: true });
+      setSelectedAddressId(id);
+    } catch (err) {
+      console.error('Failed to update default address:', err);
+    }
+  };
+
+  const handleAddAddress = () => navigate('/add-address');
+
+  const handleDeleteAddress = async (e, id) => {
+    e.stopPropagation();
+
+    if (id === selectedAddressId) {
+      alert("You can't delete the default address.");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      'Are you sure you want to delete this address?'
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await api.delete(`/address/${id}`);
+      const updated = addresses.filter((addr) => addr._id !== id);
+      setAddresses(updated);
+    } catch (err) {
+      console.error('Failed to delete address:', err);
+      alert('Could not delete the address. Try again.');
+    }
   };
 
   if (loading) return <p>Loading profile...</p>;
@@ -53,9 +107,54 @@ const ProfilePage = () => {
 
       {/* Profile Info */}
       <div className="bg-white p-6 rounded-lg shadow-md mb-10">
-        <p className="mb-2"><strong>Name:</strong> {user.name}</p>
-        <p className="mb-4"><strong>Email:</strong> {user.email}</p>
-        <div className="flex gap-4 mt-4">
+        <p className="mb-2">
+          <strong>Name:</strong> {user.name}
+        </p>
+        <p className="mb-4">
+          <strong>Email:</strong> {user.email}
+        </p>
+
+        {/* Address Section */}
+        <div className="mt-6">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold">My Addresses</h3>
+            <Button onClick={handleAddAddress} className="bg-black text-white">
+              Add Address
+            </Button>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {addresses.map((addr) => {
+              const isSelected = selectedAddressId === addr._id;
+              return (
+                <div
+                  key={addr._id}
+                  className={`relative group cursor-pointer border px-4 py-3 rounded transition duration-200 flex items-center justify-between w-full md:w-auto
+                    ${isSelected ? 'bg-black text-white' : 'bg-white text-black'}
+                  `}
+                >
+                  <div
+                    onClick={() => handleAddressChange(addr._id)}
+                    className="flex-1"
+                  >
+                    {`${addr.address}, ${addr.city}, ${addr.state} - ${addr.postalCode}`}
+                  </div>
+
+                  {!isSelected && (
+                    <button
+                      onClick={(e) => handleDeleteAddress(e, addr._id)}
+                      className="ml-3 text-red-600 hover:text-red-800"
+                      title="Delete Address"
+                    >
+                      <AiOutlineDelete size={20} />
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="flex gap-4 mt-6">
           <Button onClick={() => navigate('/change-password')}>
             Change Password
           </Button>
@@ -68,18 +167,9 @@ const ProfilePage = () => {
         {wishlistProducts.length === 0 ? (
           <p>You have no items in your wishlist.</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {wishlistProducts.map((product) => (
-              <div key={product._id} className="border p-4 rounded shadow">
-                <img
-                  src={`http://localhost:8080/uploads/${product.images[0]}`}
-                  alt={product.name}
-                  className="h-40 w-full object-cover mb-2 rounded"
-                />
-                <h3 className="font-semibold">{product.name}</h3>
-                <p className="text-sm text-gray-600">{product.brand}</p>
-                <p className="text-green-600 font-semibold">₹{product.price}</p>
-              </div>
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         )}
@@ -101,14 +191,21 @@ const ProfilePage = () => {
                 <div className="flex justify-between">
                   <div>
                     <p className="font-medium">Order ID: {order._id}</p>
-                    <p className="text-sm text-gray-600">Status: {order.orderStatus}</p>
                     <p className="text-sm text-gray-600">
-                      Total: ₹{order.totalPrice} | Items: {order.orderItems.length}
+                      Status: {order.orderStatus}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Total: ₹{order.totalPrice} | Items:{' '}
+                      {order.orderItems.length}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm">{new Date(order.createdAt).toLocaleDateString()}</p>
-                    <p className="text-xs text-gray-500">{order.paymentMethod}</p>
+                    <p className="text-sm">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {order.paymentMethod}
+                    </p>
                   </div>
                 </div>
               </Link>

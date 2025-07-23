@@ -7,7 +7,7 @@ const {
   getWishlistController
 } = require('../controllers/wishlistController');
 
-router.post('/', jwtAuthMiddleware, addToWishlistController);
+router.post('/:id', jwtAuthMiddleware, addToWishlistController);
 router.get('/', jwtAuthMiddleware, getWishlistController);
 router.delete('/:productId', jwtAuthMiddleware, removeFromWishlistController);
 

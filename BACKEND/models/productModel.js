@@ -47,4 +47,21 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+productSchema.statics.calculateReviews = async function(productId) {
+  const Review = mongoose.model('Review');
+
+  const reviews = await Review.find({ product: productId });
+
+  const numReviews = reviews.length;
+  const avgRating = numReviews === 0 ? 0 : (
+    reviews.reduce((acc, r) => acc + r.rating, 0) / numReviews
+  ).toFixed(1);
+
+  // Update product
+  await this.findByIdAndUpdate(productId, {
+    numReviews,
+    rating: avgRating
+  });
+};
+
 module.exports = mongoose.model('Product', productSchema);

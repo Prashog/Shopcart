@@ -14,29 +14,31 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product) => {
-    setCartItems(prevItems => {
-      const exist = prevItems.find(item => item.id === product.id);
-      if (exist) {
-        return prevItems.map(item =>
-          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
-        );
-      } else {
-        return [...prevItems, { ...product, qty: 1 }];
-      }
-    });
-  };
+  const addToCart = (newItem) => {
+  setCartItems((prevItems) => {
+    const existingItem = prevItems.find(item => item.id === newItem.id);
+
+    if (existingItem) {
+      // Replace quantity instead of adding
+      return prevItems.map(item =>
+        item.id === newItem.id ? { ...item, qty: newItem.qty } : item
+      );
+    } else {
+      return [...prevItems, newItem];
+    }
+  });
+};
 
   const removeFromCart = (productId) => {
     setCartItems(prevItems => prevItems.filter(item => item.id !== productId));
   };
 
-  const updateQuantity = (productId, qty) => {
-     setCartItems(prevItems =>
-        prevItems.map(item =>
-          item.id === productId ? { ...item, qty } : item
-        )
-      );
+  const updateQuantity = (id, newQty) => {
+    setCartItems(prevItems =>
+      prevItems.map(item =>
+        item.id === id ? { ...item, qty: newQty } : item
+      )
+    );
   };
 
   const clearCart = () => {

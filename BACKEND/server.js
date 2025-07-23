@@ -21,7 +21,9 @@ const orderRouter = require('./routes/orderRouter.js')
 const adminOrderRouter = require('./routes/adminOrderRouter.js')
 const productsRouter = require('./routes/productsRouter.js')
 const reviewRouter = require('./routes/reviewRouter')
-const wishlistRouter = require('./routes/wishlistRouter');
+const wishlistRouter = require('./routes/wishlistRouter')
+const addressRouter = require('./routes/addressRouter.js')
+const contactRoutes = require('./routes/contactRoutes');
 
 app.use('/auth', authRouter)
 app.use('/users', userRouter)
@@ -30,8 +32,10 @@ app.use('/categories', categoriesRouter)
 app.use('/orders', orderRouter)
 app.use('/admin/orders', adminOrderRouter)
 app.use('/products', productsRouter)
-app.use('/reviews', reviewRouter);
-app.use('/wishlist', wishlistRouter);
+app.use('/reviews', reviewRouter)
+app.use('/wishlist', wishlistRouter)
+app.use('/address', addressRouter)
+app.use('/api', contactRoutes);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server is running on port: ${process.env.PORT}`)
