@@ -4,6 +4,7 @@ import { getProductById, submitReview } from '../services/api';
 import axios from 'axios';
 import Button from '../components/common/Button';
 import { useCart } from '../contexts/CartContext';
+import { useWishlist } from '../contexts/WishlistContext';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { getWishlist, addToWishlist, removeFromWishlist } from '../services/api';
 import { Star, StarHalf, Star as StarOutline } from 'lucide-react';
@@ -21,6 +22,7 @@ const ProductDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [isFavourite, setIsFavourite] = useState(false);
   const [wishlistId, setWishlistId] = useState(null);
+  const { wishlist, refreshWishlist } = useWishlist();
 
   const fetchProduct = async () => {
     try {
@@ -40,19 +42,10 @@ const ProductDetailPage = () => {
     }
   };
 
-  const checkWishlistStatus = async () => {
-    try {
-      const { data } = await getWishlist();
-      const match = data.response.find((item) => item._id === id);
-      if (match) {
-        setIsFavourite(true);
-        setWishlistId(match._id);
-      } else {
-        setIsFavourite(false);
-      }
-    } catch (err) {
-      console.error('Failed to fetch wishlist', err);
-    }
+  const checkWishlistStatus = () => {
+    const match = wishlist.find((item) => item._id === id);
+    setIsFavourite(!!match);
+    setWishlistId(match?._id || null);
   };
 
   useEffect(() => {
@@ -60,10 +53,13 @@ const ProductDetailPage = () => {
       setLoading(true);
       await fetchProduct();
       await fetchReviews();
-      await checkWishlistStatus();
       setLoading(false);
     })();
   }, [id]);
+
+  useEffect(() => {
+    checkWishlistStatus();
+  }, [wishlist, id]);
 
   useEffect(() => {
     if (product?.images?.length > 1) {
@@ -120,11 +116,12 @@ const ProductDetailPage = () => {
       } else {
         await addToWishlist(product._id);
       }
-      await checkWishlistStatus();
+      await refreshWishlist();
     } catch (err) {
       console.error('Failed to toggle wishlist', err);
     }
   };
+
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -215,14 +212,22 @@ const ProductDetailPage = () => {
           </div>
 
           <div className="flex gap-4 mt-4">
-            <Button onClick={handleAddToCart} className="bg-black text-white">Add to Cart</Button>
-            <Button onClick={handleBuyNow} className="bg-black text-white">Buy Now</Button>
-            <Button onClick={toggleWishlist} className="flex items-center gap-2 border border-black text-white">
-              {isFavourite ? <AiFillHeart className="text-red-600" /> : <AiOutlineHeart className="text-white" />} Favourite
+            <Button onClick={handleAddToCart} className="bg-black text-white hover:bg-blue-100 hover:text-black">Add to Cart</Button>
+            <Button onClick={handleBuyNow} className="bg-black text-white hover:bg-blue-100 hover:text-black">Buy Now</Button>
+            <Button
+              onClick={toggleWishlist}
+              className="group flex items-center gap-2 border border-black text-white hover:bg-blue-100 hover:text-black"
+            >
+              {isFavourite ? (
+                <AiFillHeart className="text-red-600 group-hover:text-black" />
+              ) : (
+                <AiOutlineHeart className="text-white group-hover:text-black" />
+              )}
+              Favourite
             </Button>
           </div>
 
-          <div className="mt-6 flex items-center gap-4 bg-gray-100 p-4 rounded">
+          <div className="mt-6 flex items-center gap-4 bg-gray-100 p-4 rounded-lg">
             <span className="text-2xl">🚚</span>
             <div>
               <p className="font-semibold">Free Delivery</p>
@@ -230,7 +235,7 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          <div className="mt-4 flex items-center gap-4 bg-gray-100 p-4 rounded">
+          <div className="mt-4 flex items-center gap-4 bg-gray-100 p-4 rounded-lg">
             <span className="text-2xl">🔁</span>
             <div>
               <p className="font-semibold">10-Day Replacement</p>
@@ -243,11 +248,15 @@ const ProductDetailPage = () => {
       {/* Reviews */}
       <section className="mt-12">
         <h2 className="text-2xl font-bold mb-4 text-black">Customer Reviews</h2>
+
         {reviews.length > 0 ? (
-          <ul className="space-y-4">
+          <ul className="space-y-2">
             {reviews.map((review) => (
-              <li key={review._id} className="border border-black p-4 rounded bg-white text-black">
-                <div className="flex items-center gap-1 text-black text-sm">
+              <li
+                key={review._id}
+                className="bg-white text-black p-4 rounded shadow-sm"
+              >
+                <div className="flex items-center gap-1 text-sm">
                   {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
                 </div>
                 <p className="italic mt-1">"{review.comment}"</p>
@@ -264,12 +273,16 @@ const ProductDetailPage = () => {
             <label className="block font-medium text-black mb-1">Rating:</label>
             <select
               value={reviewInput.rating}
-              onChange={(e) => setReviewInput({ ...reviewInput, rating: parseInt(e.target.value) })}
-              className="border border-black p-2 rounded w-32 text-black"
+              onChange={(e) =>
+                setReviewInput({ ...reviewInput, rating: parseInt(e.target.value) })
+              }
+              className="border border-gray-300 p-2 rounded w-32 text-black"
             >
               <option value={0}>Select</option>
               {[1, 2, 3, 4, 5].map((n) => (
-                <option key={n} value={n}>{n}</option>
+                <option key={n} value={n}>
+                  {n}
+                </option>
               ))}
             </select>
           </div>
@@ -277,14 +290,19 @@ const ProductDetailPage = () => {
             <label className="block font-medium text-black mb-1">Comment:</label>
             <textarea
               value={reviewInput.comment}
-              onChange={(e) => setReviewInput({ ...reviewInput, comment: e.target.value })}
-              className="w-full border border-black p-2 rounded h-24 text-black"
+              onChange={(e) =>
+                setReviewInput({ ...reviewInput, comment: e.target.value })
+              }
+              className="w-full border border-gray-300 p-2 rounded h-24 text-black"
               placeholder="Write your review..."
             />
           </div>
-          <Button type="submit" className="bg-black text-white">Submit Review</Button>
+          <Button type="submit" className="bg-black text-white hover:bg-blue-100 hover:text-black">
+            Submit Review
+          </Button>
         </form>
       </section>
+
     </div>
   );
 };

@@ -73,6 +73,7 @@ const CheckoutPage = () => {
                     {showAddressList ? 'Hide Addresses' : 'Select Address'}
                   </Button>
                   <Button
+                    className='hover:bg-gray-300 hover:text-black'
                     variant="primary"
                     onClick={() =>
                       navigate('/add-address', { state: { returnTo: '/checkout' } })
@@ -148,7 +149,7 @@ const CheckoutPage = () => {
                       <Input name="cvc" placeholder="CVC" />
                     </div>
                   </div>
-                  <Button className="w-full mt-6" type="submit">
+                  <Button className="w-full mt-6 hover:bg-gray-300 hover:text-black" type="submit">
                     Pay Now
                   </Button>
                 </form>

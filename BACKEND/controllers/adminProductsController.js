@@ -81,8 +81,26 @@ async function deleteProductController(req, res) {
     }
 };
 
+async function getTopSellingProducts(req, res) {
+    try {
+        const products = await productModel.find().sort({itemsSold: -1}).limit(10);
+        
+        res.status(200).json({
+            success: true,
+            response: products
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server'
+        })
+    }
+}
+
 module.exports = {
     createProductController,
     updateProductController,
-    deleteProductController
+    deleteProductController,
+    getTopSellingProducts
 }

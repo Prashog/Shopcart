@@ -1,15 +1,13 @@
 const nodemailer = require('nodemailer');
 
 const sendContactMessageController = async (req, res) => {
-  const { name, email, message } = req.body;
-  console.log('Received contact form:', { name, email, message });
-
-  if (!name || !email || !message) {
-    console.log('Validation failed');
-    return res.status(400).json({ success: false, error: 'All fields are required.' });
-  }
-
   try {
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({ success: false, error: 'All fields are required.' });
+    }
+
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -21,7 +19,7 @@ const sendContactMessageController = async (req, res) => {
     const mailOptions = {
       from: `"ShopCart Contact" <${process.env.SMTP_EMAIL}>`,
       to: process.env.SMTP_EMAIL,
-      subject: `New Contact Message from ${name}`,
+      subject: `New Contact Message from ${name || 'Customer'}`,
       text: `From: ${name}\nEmail: ${email}\n\n${message}`,
     };
 
@@ -31,7 +29,7 @@ const sendContactMessageController = async (req, res) => {
     res.status(200).json({ success: true, message: 'Message sent successfully' });
 
   } catch (err) {
-    console.error('❌ Email sending error:', err);
+    console.error('Failed to send contact message:', err);
     res.status(500).json({ success: false, error: 'Failed to send message', details: err.message });
   }
 };

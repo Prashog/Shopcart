@@ -12,31 +12,35 @@ const CartPage = () => {
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-3xl font-bold">Your Cart is Empty</h1>
         <Link to="/products">
-          <Button className="mt-6">Continue Shopping</Button>
+          <Button className="mt-6 hover:bg-gray-300 hover:text-black">Continue Shopping</Button>
         </Link>
       </div>
     );
   }
 
-  console.log('Cart Items:', cartItems);
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
-      <div className="grid md:grid-cols-3 gap-8">
-        <div className="md:col-span-2">
-          {cartItems.map(item => (
-            // CartItem component would go here
-            <div key={item.id} className="flex items-center justify-between bg-white p-4 rounded-lg shadow mb-4">
-              <img src={item.imageUrl} alt={item.name} className="w-20 h-20 object-cover rounded" />
+    <div className="container mx-auto px-4 pt-8 pb-4">
+      <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
+      <div className="grid md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 space-y-4">
+          {cartItems.map((item, index) => (
+            <div
+              key={item._id || item.id || index}
+              className="bg-white p-4 rounded-lg shadow-sm flex items-center justify-between"
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.name}
+                className="w-20 h-20 object-cover rounded"
+              />
               <div className="flex-grow px-4">
-                <h2 className="font-semibold">{item.name}</h2>
-                <p>₹{item.price}</p>
+                <h2 className="font-semibold text-lg">{item.name}</h2>
+                <p className="text-gray-700">₹{item.price}</p>
               </div>
               <input
                 type="number"
                 min={1}
-                max={item.stock || 99} // fallback if stock is missing
+                max={item.stock || 99}
                 value={item.qty}
                 onChange={(e) => {
                   const newQty = parseInt(e.target.value);
@@ -47,11 +51,17 @@ const CartPage = () => {
                 }}
                 className="w-16 text-center border rounded"
               />
-              <button onClick={() => removeFromCart(item.id)} className="text-red-500 hover:text-red-700 ml-4">Remove</button>
+              <button
+                onClick={() => removeFromCart(item.id)}
+                className="text-red-500 hover:text-red-700 ml-4"
+              >
+                Remove
+              </button>
             </div>
           ))}
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
+
+        <div className="bg-white p-6 rounded-lg shadow-sm h-fit">
           <h2 className="text-2xl font-semibold mb-4">Order Summary</h2>
           <div className="flex justify-between mb-2">
             <span>Subtotal</span>
@@ -66,7 +76,7 @@ const CartPage = () => {
             <span>₹{subtotal.toFixed(2)}</span>
           </div>
           <Link to="/checkout">
-            <Button className="w-full mt-6">Proceed to Checkout</Button>
+            <Button className="w-full mt-6 hover:bg-gray-300 hover:text-black">Proceed to Checkout</Button>
           </Link>
         </div>
       </div>

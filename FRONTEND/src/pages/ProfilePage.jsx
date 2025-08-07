@@ -163,12 +163,23 @@ const ProfilePage = () => {
 
       {/* Wishlist Section */}
       <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">Wishlist</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-2xl font-bold">Wishlist</h2>
+          {wishlistProducts.length > 0 && (
+            <Button
+              onClick={() => navigate('/wishlist')}
+              className="text-sm bg-black text-white"
+            >
+              See All
+            </Button>
+          )}
+        </div>
+
         {wishlistProducts.length === 0 ? (
           <p>You have no items in your wishlist.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {wishlistProducts.map((product) => (
+            {wishlistProducts.slice(0, 4).map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
           </div>

@@ -15,7 +15,7 @@ const OrderSummary = ({ children }) => {
             
             <div className="flex mb-4">
                 <Input name="coupon" placeholder="Enter Coupon Code" className="rounded-r-none" />
-                <Button className="rounded-l-none">Apply Coupon</Button>
+                <Button className="rounded-l-none hover:bg-gray-300 hover:text-black">Apply Coupon</Button>
             </div>
 
             <div className="space-y-2 text-gray-700">

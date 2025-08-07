@@ -24,7 +24,6 @@ async function getProducts(req, res) {
   }
 }
 
-
 async function getProductById(req, res) {
     try {
         const productId = req.params.id;
@@ -51,7 +50,97 @@ async function getProductById(req, res) {
     }
 }
 
+async function getBestSellingProducts(req, res) {
+    try {
+        const products = await productModel.find().sort({itemsSold: -1}).limit(10);
+        
+        res.status(200).json({
+            success: true,
+            response: products
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server'
+        })
+    }
+}
+
+async function dealOfTheDay(req, res) {
+    try {
+        const products = await productModel.find({stock: {$gt: 0}}).sort({itemsSold: 1}).limit(6);
+
+        res.status(200).json({
+            success: true,
+            response: products
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: true,
+            error: 'Internal Server Error'
+        })
+    }
+}
+
+async function newArrival(req, res) {
+    try {
+        const products = await productModel.find().sort({createdAt: -1}).limit(4);
+
+        res.status(200).json({
+            success: true,
+            response: products
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+        })
+    }
+}
+
+async function discountedProduct(req, res) {
+    try {
+        const products = await productModel.find({stock: {$gt: 0}}).sort({itemsSold: 1}).limit(6);
+
+        res.status(200).json({
+            success: true,
+            response: products
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+        })
+    }
+}
+
+async function comingSoon(req, res) {
+    try {
+        const products = await productModel.find().sort({createdAt: -1}).limit(4);
+
+        res.status(200).json({
+            success: true,
+            response: products
+        })
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            error: 'Internal Server Error'
+        })
+    }
+}
+
 module.exports = {
     getProducts,
-    getProductById
+    getProductById,
+    getBestSellingProducts,
+    dealOfTheDay,
+    newArrival,
+    discountedProduct,
+    comingSoon
 }

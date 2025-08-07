@@ -53,6 +53,7 @@ export const getOrderById = (id) => api.get(`/orders/${id}`);
 
 // ===== Categories =====
 export const getCategories = () => api.get('/categories');
+export const getCategoryDisplay = () => api.get('/categories/category-display');
 
 // ===== Review and wishlist =====
 export const addToWishlist = (id) =>
@@ -73,5 +74,15 @@ export const updateAddress = (addressId, updatedData) => api.put(`/address/${add
 export const deleteAddress = (addressId) => api.delete(`/address/${addressId}`);
 export const getAddresses = () => api.get('/address');
 export const getPrimaryAddress = () => api.get('/address/primary');
+
+// ===== Sorted Products =====
+export const getBestSellers = () => api.get('/products/bestsellers');
+export const dealOfTheDay = () => api.get('/products/deal-of-day');
+export const newArrival = () => api.get('/products/new-arrival');
+export const getDiscountedProducts = () => api.get('/products/discounted');
+export const getCommingSoonProducts = () => api.get('/products/coming-soon');
+
+// ===== Contact Us =====
+export const sendContactMessage = (data) => api.post('/contact/', data);
 
 export default api;

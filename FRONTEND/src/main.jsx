@@ -6,7 +6,10 @@ import { AuthProvider } from './contexts/AuthContext.jsx'
 import { ProductProvider } from './contexts/ProductContext.jsx'
 import { CartProvider } from './contexts/CartContext.jsx'
 import { CategoryProvider } from './contexts/CategoryContext.jsx'
+import { WishlistProvider } from './contexts/WishlistContext'
 import { BrowserRouter } from 'react-router-dom';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -15,7 +18,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <ProductProvider>
           <CategoryProvider>
             <CartProvider>
-              <App />
+              <WishlistProvider>
+                <App />
+              </WishlistProvider>
             </CartProvider>
           </CategoryProvider>
         </ProductProvider>

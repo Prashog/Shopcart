@@ -1,6 +1,5 @@
-// Example: BestSellersSection.jsx
 import { useEffect, useState } from 'react';
-import { getBestSellers } from '../services/productService';
+import { getBestSellers } from '../services/api';
 
 const BestSellersSection = () => {
   const [products, setProducts] = useState([]);

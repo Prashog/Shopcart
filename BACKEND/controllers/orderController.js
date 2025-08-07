@@ -54,6 +54,7 @@ async function createOrderController(req, res) {
 
             itemsPrice += product.price * item.quantity;
             product.stock -= item.quantity;
+            product.itemsSold += item.quantity;
             await product.save();
         }
 
